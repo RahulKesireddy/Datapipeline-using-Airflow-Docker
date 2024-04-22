@@ -1,0 +1,32 @@
+[2024-04-19T11:25:04.800+0000] {taskinstance.py:1165} INFO - Dependencies all met for <TaskInstance: twitter_sentiment_analysis.EDA manual__2024-04-19T11:25:01.467304+00:00 [queued]>
+[2024-04-19T11:25:04.808+0000] {taskinstance.py:1165} INFO - Dependencies all met for <TaskInstance: twitter_sentiment_analysis.EDA manual__2024-04-19T11:25:01.467304+00:00 [queued]>
+[2024-04-19T11:25:04.809+0000] {taskinstance.py:1362} INFO - 
+--------------------------------------------------------------------------------
+[2024-04-19T11:25:04.810+0000] {taskinstance.py:1363} INFO - Starting attempt 1 of 1
+[2024-04-19T11:25:04.810+0000] {taskinstance.py:1364} INFO - 
+--------------------------------------------------------------------------------
+[2024-04-19T11:25:04.825+0000] {taskinstance.py:1383} INFO - Executing <Task(PythonOperator): EDA> on 2024-04-19 11:25:01.467304+00:00
+[2024-04-19T11:25:04.832+0000] {standard_task_runner.py:55} INFO - Started process 114 to run task
+[2024-04-19T11:25:04.836+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'twitter_sentiment_analysis', 'EDA', 'manual__2024-04-19T11:25:01.467304+00:00', '--job-id', '18', '--raw', '--subdir', 'DAGS_FOLDER/SentimentAnalysis_dag.py', '--cfg-path', '/tmp/tmp6p6bvzqj']
+[2024-04-19T11:25:04.840+0000] {standard_task_runner.py:83} INFO - Job 18: Subtask EDA
+[2024-04-19T11:25:04.898+0000] {task_command.py:376} INFO - Running <TaskInstance: twitter_sentiment_analysis.EDA manual__2024-04-19T11:25:01.467304+00:00 [running]> on host e23f925acc89
+[2024-04-19T11:25:04.981+0000] {taskinstance.py:1592} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=twitter_sentiment_analysis
+AIRFLOW_CTX_TASK_ID=EDA
+AIRFLOW_CTX_EXECUTION_DATE=2024-04-19T11:25:01.467304+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2024-04-19T11:25:01.467304+00:00
+[2024-04-19T11:25:04.983+0000] {taskinstance.py:1851} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 175, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 193, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/SentimentAnalysis_dag.py", line 23, in EDA
+    train.dropna(inplace=True)
+UnboundLocalError: local variable 'train' referenced before assignment
+[2024-04-19T11:25:04.999+0000] {taskinstance.py:1406} INFO - Marking task as FAILED. dag_id=twitter_sentiment_analysis, task_id=EDA, execution_date=20240419T112501, start_date=20240419T112504, end_date=20240419T112504
+[2024-04-19T11:25:05.015+0000] {standard_task_runner.py:105} ERROR - Failed to execute job 18 for task EDA (local variable 'train' referenced before assignment; 114)
+[2024-04-19T11:25:05.048+0000] {local_task_job.py:164} INFO - Task exited with return code 1
+[2024-04-19T11:25:05.072+0000] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check
