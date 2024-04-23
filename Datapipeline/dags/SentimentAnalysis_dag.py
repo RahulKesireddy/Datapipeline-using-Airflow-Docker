@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 #from nltk.corpus import stopwords
-from ML.dataunderstanding import data_understanding
+from ML.dataunderstanding import data_analysis
 from ML.datacleaning import data_cleaning
 
 
@@ -15,8 +15,8 @@ def load_data():
     test=Dataset(r"C:\Users\rahul\OneDrive\Documents\Datapipeline\dataset\test.csv")
     pass
 
-def dataunderstanding():
-    data_understanding(r"C:\Users\rahul\OneDrive\Documents\Datapipeline\dataset\understanding_train.csv",r"C:\Users\rahul\OneDrive\Documents\Datapipeline\dataset\test.csv")
+def dataanalysis():
+    data_analysis(r"C:\Users\rahul\OneDrive\Documents\Datapipeline\dataset\understanding_train.csv",r"C:\Users\rahul\OneDrive\Documents\Datapipeline\dataset\test.csv")
     pass
 
 def datacleaning():
@@ -25,24 +25,28 @@ def datacleaning():
 
 
 
-with DAG('twitter_sentiment_analysis',start_date=datetime(2024,4,17),schedule_interval='@daily',catchup=False) as dag:
+with DAG('twitter_sentiment_analysis',
+         start_date=datetime(2024,4,17),
+         schedule_interval='@daily',
+         catchup=False) as dag:
 
 #dag = DAG('twitter_sentiment_analysis',start_date=datetime(2024,4,17), schedule_interval='@daily',catchup=False)
 
 
- load_data = PythonOperator(
-    task_id='load_data',
-    python_callable= load_data,
- )
+    get_data = PythonOperator(
+        task_id='get_data',
+        python_callable= load_data,
+    )
 
- dataunderstanding= PythonOperator(
-    task_id='dataunderstanding',
-    python_callable=dataunderstanding
- )
+    data_eda = PythonOperator(
+        task_id='data_eda',
+        python_callable=dataanalysis
+    )
 
- datacleaning= PythonOperator(
-    task_id='datacleaning',
-    python_callable=datacleaning
- )
+    data_prep = PythonOperator(
+        task_id='data_prep',
+        python_callable=datacleaning
+    )
 
-load_data >> dataunderstanding >> datacleaning
+    get_data >> data_eda >> data_prep
+
