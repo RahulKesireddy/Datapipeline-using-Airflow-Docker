@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords
+import spacy
+from tqdm import tqdm
+from spacy.util import minibatch, compounding
 from collections import Counter
 import logging
 
