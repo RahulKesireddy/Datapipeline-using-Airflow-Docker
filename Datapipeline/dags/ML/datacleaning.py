@@ -120,8 +120,8 @@ def data_cleaning(train_file, test_file):
      return Unique_words
     
     Unique_Positive= words_unique('positive', 20, raw_text)
-    print("The top 20 unique words in Positive Tweets are:")
-    logging.info("Top Positive Tweets")
+    #print("The top 20 unique words in Positive Tweets are:")
+    logging.info(f"Top 20 Positive Tweets: {Unique_Positive}")
 
     Unique_Negative= words_unique('negative', 10, raw_text)
     print("The top 10 unique words in Negative Tweets are:")
