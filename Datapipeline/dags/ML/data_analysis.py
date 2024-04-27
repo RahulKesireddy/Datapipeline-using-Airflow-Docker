@@ -18,12 +18,6 @@ logging.basicConfig(filename=os.path.join(log_directory, 'data_analysis.log'),
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 
-def jaccard(str1, str2):
-    a = set(str1.lower().split())
-    b = set(str2.lower().split())
-    c = a.intersection(b)
-    return float(len(c)) / (len(a) + len(b) - len(c))
-
 def data_analysis(train_file, test_file):
     logging.info("Starting data analysis process.")
 
@@ -43,10 +37,17 @@ def data_analysis(train_file, test_file):
     plt.clf()
     logging.info("Sentiment count plot saved.")
 
+    def jaccard(str1, str2): 
+     a = set(str1.lower().split()) 
+     b = set(str2.lower().split())
+     c = a.intersection(b)
+     return float(len(c)) / (len(a) + len(b) - len(c))
+
     results_jaccard = []
     for ind, row in train.iterrows():
         sentence1 = row.text
         sentence2 = row.selected_text
+
         jaccard_score = jaccard(sentence1, sentence2)
         results_jaccard.append([sentence1, sentence2, jaccard_score])
 
@@ -54,10 +55,14 @@ def data_analysis(train_file, test_file):
     train = train.merge(jaccard_df, how='outer')
     logging.info("Jaccard scores calculated and merged.")
 
+    train['Num_words_ST'] = train['selected_text'].apply(lambda x:len(str(x).split())) #Number Of words in Selected Text
+    train['Num_word_text'] = train['text'].apply(lambda x:len(str(x).split())) #Number Of words in main text
+    train['difference_in_words'] = train['Num_word_text'] - train['Num_words_ST'] #Difference in Number of words text and Selected Text
+    
     # KDE plots
     plt.figure(figsize=(12,6))
     p1 = sns.kdeplot(train['Num_words_ST'], shade=True, color="r").set_title('Kernel Distribution of Number Of words')
-    p2 = sns.kdeplot(train['Num_word_text'], shade=True, color="b")
+    p1 = sns.kdeplot(train['Num_word_text'], shade=True, color="b")
     plt.savefig("/opt/airflow/dataset/word_distribution.png")
     plt.clf()
     logging.info("Word distribution plot saved.")
@@ -81,7 +86,7 @@ def data_analysis(train_file, test_file):
     k.groupby('sentiment').mean()['jaccard_score']
     logging.info(f"Mean Jaccard scores for short texts computed.")
 
-    train.to_csv("/opt/airflow/dataset/understanding_train.csv", index=False)
+    train.to_csv("/opt/airflow/dataset/analysis_train.csv", index=False)
     logging.info("Processed data saved as CSV.")
 
 # if 'AIRFLOW_HOME' not in os.environ:

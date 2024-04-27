@@ -7,6 +7,7 @@ from collections import Counter
 #from nltk.corpus import stopwords
 from ML.data_analysis import data_analysis
 from ML.data_preprocessing import data_preprocessing
+from ML.training import data_training
 import os
 from airflow.models import Variable
 
@@ -14,6 +15,8 @@ from airflow.models import Variable
 TRAIN_FILE = '/opt/airflow/dataset/train.csv'
 TEST_FILE = '/opt/airflow/dataset/test.csv'
 ANALYSIS_TRAIN_FILE = '/opt/airflow/dataset/analysis_train.csv'
+PREPROCESSED_FILE='/opt/airflow/dataset/cleaned_train.csv'
+#TRAINED_FILE='/opt/airflow/dataset/trained_data.csv'
 
 def files_exists():
     train_path = Variable.get("train_file_path", TRAIN_FILE)
@@ -73,5 +76,11 @@ with DAG('twitter_sentiment_analysis',
         op_args=[ANALYSIS_TRAIN_FILE, TEST_FILE]
     )
 
-    check_files >> data_eda >> data_prep
+    data_train = PythonOperator(
+        task_id='data_train',
+        python_callable=data_training,
+        op_args=[TRAIN_FILE, TEST_FILE]
+    )
+
+    check_files >> data_eda >> data_prep >> data_train
 
