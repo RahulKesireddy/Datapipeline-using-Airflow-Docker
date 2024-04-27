@@ -112,7 +112,7 @@ def data_training(train_file, test_file):
     df_test.to_csv("/opt/airflow/dataset/predicted_data.csv", index=False)
     logging.info("Predicted data saved to CSV.")
 
-if __name__ == "__main__":
-    train_file = "train.csv"
-    test_file = "test.csv"
-    data_training(train_file, test_file)
+# if __name__ == "__main__":
+#     train_file = "train.csv"
+#     test_file = "test.csv"
+#     data_training(train_file, test_file)
