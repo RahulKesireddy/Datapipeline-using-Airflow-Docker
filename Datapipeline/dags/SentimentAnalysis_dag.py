@@ -44,17 +44,17 @@ with DAG('twitter_sentiment_analysis',
         python_callable= files_exists,
     )
 
-    # data_eda = PythonOperator(
-    #     task_id='data_eda',
-    #     python_callable=data_analysis,
-    #     op_args=[TRAIN_FILE, TEST_FILE]
-    # )
+    data_eda = PythonOperator(
+        task_id='data_eda',
+        python_callable=data_analysis,
+        op_args=[TRAIN_FILE, TEST_FILE]
+    )
 
-    # data_prep = PythonOperator(
-    #     task_id='data_prep',
-    #     python_callable=data_preprocessing,
-    #     op_args=[ANALYSIS_TRAIN_FILE, TEST_FILE]
-    # )
+    data_prep = PythonOperator(
+        task_id='data_prep',
+        python_callable=data_preprocessing,
+        op_args=[ANALYSIS_TRAIN_FILE, TEST_FILE]
+    )
 
     data_train = PythonOperator(
         task_id='data_train',
@@ -62,6 +62,5 @@ with DAG('twitter_sentiment_analysis',
         op_args=[TRAIN_FILE, TEST_FILE]
     )
 
-    # check_files >> data_eda >> data_prep >> data_train
-    check_files >> data_train
+    check_files >> data_eda >> data_prep >> data_train
 
