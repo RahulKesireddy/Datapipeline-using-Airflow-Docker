@@ -16,7 +16,6 @@ logging.basicConfig(filename=os.path.join(log_directory, 'data_training.log'),
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 def save_model(output_dir, nlp, new_model_name):
-    output_dir ='/opt/airflow/models/working'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     nlp.meta["name"] = new_model_name
@@ -40,8 +39,8 @@ def predict_entities(text, model):
 
 def train_ner(train_data, output_dir, n_iter=20, model=None):
     if model is not None:
-        nlp = spacy.load(output_dir)
-        logging.info("Loaded model " + model)
+        nlp = spacy.load(model)
+        logging.info("Loaded model from " + model)
     else:
         nlp = spacy.blank("en")
         logging.info("Created blank 'en' model")
@@ -71,20 +70,10 @@ def train_ner(train_data, output_dir, n_iter=20, model=None):
     save_model(output_dir, nlp, 'st_ner')
 
 def get_model_out_path(sentiment):
-    '''
-    Returns Model output path
-    '''
-    model_out_path = None
-    if sentiment == 'positive':
-        model_out_path = '/opt/airflow/models/model_pos'
-    elif sentiment == 'negative':
-        model_out_path = '/opt/airflow/models/model_neg'
+    model_out_path = '/opt/airflow/models/' + ('model_pos' if sentiment == 'positive' else 'model_neg')
     return model_out_path
 
-def get_training_data(df_train,sentiment):
-    '''
-    Returns Trainong data in the format needed to train spacy NER
-    '''
+def get_training_data(df_train, sentiment):
     train_data = []
     for index, row in df_train.iterrows():
         if row.sentiment == sentiment:
@@ -95,47 +84,27 @@ def get_training_data(df_train,sentiment):
             train_data.append((text, {"entities": [[start, end, 'selected_text']]}))
     return train_data
 
-# Data loading and processing
 def data_training(train_file, test_file):
     logging.info("Starting data training process.")
-
-
-    model_pos_dir = '/opt/airflow/models/model_pos'
-    model_neg_dir = '/opt/airflow/models/model_neg'
-
-    if not os.path.exists(model_pos_dir):
-        os.makedirs(model_pos_dir)
-        print(f"Created directory for 'model_pos' at: {model_pos_dir}")
-    if not os.path.exists(model_neg_dir):
-        os.makedirs(model_neg_dir)
-        print(f"Created directory for 'model_neg' at: {model_neg_dir}")
-
-        
+    
     df_train = pd.read_csv(train_file)
     df_test = pd.read_csv(test_file)
 
     df_train['Num_words_text'] = df_train['text'].apply(lambda x: len(str(x).split()))
-    logging.info("Number Of words in main Text in train set calculated.")
+    logging.info("Number of words in main Text in train set calculated.")
     df_train = df_train[df_train['Num_words_text'] >= 3]
 
-    sentiment = 'positive'
-    train_data = get_training_data(df_train, sentiment)
-    model_path = get_model_out_path(sentiment)
-    train_ner(train_data, model_path, n_iter=3, model=None)
-    logging.info("Model trained for positive tweets.")
+    for sentiment in ['positive', 'negative']:
+        train_data = get_training_data(df_train, sentiment)
+        model_path = get_model_out_path(sentiment)
+        train_ner(train_data, model_path, n_iter=3)
+        logging.info(f"Model trained for {sentiment} tweets.")
 
-    sentiment = 'negative'
-    train_data = get_training_data(df_train, sentiment)
-    model_path = get_model_out_path(sentiment)
-    train_ner(train_data, model_path, n_iter=3, model=None)
-    logging.info("Model trained for negative tweets.")
-
-    # Load models
-    model_pos = load_model('/opt/airflow/models/model_pos')
-    model_neg = load_model('/opt/airflow/models/model_neg')
-
-    # Predicting
+    # Load models and predict
     selected_texts = []
+    model_pos = load_model(get_model_out_path('positive'))
+    model_neg = load_model(get_model_out_path('negative'))
+
     for index, row in df_test.iterrows():
         text = row.text
         if row.sentiment == 'neutral' or len(text.split()) <= 2:
@@ -146,11 +115,10 @@ def data_training(train_file, test_file):
             selected_texts.append(predict_entities(text, model_neg))
     df_test['selected_text'] = selected_texts
 
-    # Example saving output to CSV, modify as necessary
     df_test.to_csv("/opt/airflow/dataset/predicted_data.csv", index=False)
     logging.info("Predicted data saved to CSV.")
 
 # if __name__ == "__main__":
-#     train_file = "train.csv"
-#     test_file = "test.csv"
+#     train_file = "/path/to/your/train.csv"
+#     test_file = "/path/to/your/test.csv"
 #     data_training(train_file, test_file)

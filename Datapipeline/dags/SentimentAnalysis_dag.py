@@ -34,47 +34,27 @@ def files_exists():
     return True
 
 
-# def load_data():
-#     train=Dataset("/opt/airflow/train.csv")
-#     test=Dataset("/opt/airflow/test.csv")
-#     return True
-
-# def data_analysis():
-#     data_analysis("/opt/airflow/dataset/train.csv","/opt/airflow/dataset/test.csv")
-#     pass
-
-# def data_preprocessing():
-#     data_preprocessing("/opt/airflow/dataset/analysis_train.csv","/opt/airflow/dataset/test.csv")
-#     pass
-
-# config.py
-
-
-
 with DAG('twitter_sentiment_analysis',
          start_date=datetime(2024,4,24),
          schedule_interval='@daily',
          catchup=False) as dag:
-
-#dag = DAG('twitter_sentiment_analysis',start_date=datetime(2024,4,17), schedule_interval='@daily',catchup=False)
-
 
     check_files = PythonOperator(
         task_id='check_files',
         python_callable= files_exists,
     )
 
-    data_eda = PythonOperator(
-        task_id='data_eda',
-        python_callable=data_analysis,
-        op_args=[TRAIN_FILE, TEST_FILE]
-    )
+    # data_eda = PythonOperator(
+    #     task_id='data_eda',
+    #     python_callable=data_analysis,
+    #     op_args=[TRAIN_FILE, TEST_FILE]
+    # )
 
-    data_prep = PythonOperator(
-        task_id='data_prep',
-        python_callable=data_preprocessing,
-        op_args=[ANALYSIS_TRAIN_FILE, TEST_FILE]
-    )
+    # data_prep = PythonOperator(
+    #     task_id='data_prep',
+    #     python_callable=data_preprocessing,
+    #     op_args=[ANALYSIS_TRAIN_FILE, TEST_FILE]
+    # )
 
     data_train = PythonOperator(
         task_id='data_train',
@@ -82,5 +62,6 @@ with DAG('twitter_sentiment_analysis',
         op_args=[TRAIN_FILE, TEST_FILE]
     )
 
-    check_files >> data_eda >> data_prep >> data_train
+    # check_files >> data_eda >> data_prep >> data_train
+    check_files >> data_train
 
