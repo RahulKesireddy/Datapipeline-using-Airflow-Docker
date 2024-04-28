@@ -16,7 +16,7 @@ logging.basicConfig(filename=os.path.join(log_directory, 'data_training.log'),
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 def save_model(output_dir, nlp, new_model_name):
-    output_dir ='/opt/airflow/dataset/working'
+    output_dir ='/opt/airflow/models/working'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     nlp.meta["name"] = new_model_name
@@ -76,9 +76,9 @@ def get_model_out_path(sentiment):
     '''
     model_out_path = None
     if sentiment == 'positive':
-        model_out_path = '/opt/airflow/dataset/model_pos'
+        model_out_path = '/opt/airflow/models/model_pos'
     elif sentiment == 'negative':
-        model_out_path = '/opt/airflow/dataset/model_neg'
+        model_out_path = '/opt/airflow/models/model_neg'
     return model_out_path
 
 def get_training_data(df_train,sentiment):
@@ -98,6 +98,19 @@ def get_training_data(df_train,sentiment):
 # Data loading and processing
 def data_training(train_file, test_file):
     logging.info("Starting data training process.")
+
+
+    model_pos_dir = '/opt/airflow/models/model_pos'
+    model_neg_dir = '/opt/airflow/models/model_neg'
+
+    if not os.path.exists(model_pos_dir):
+        os.makedirs(model_pos_dir)
+        print(f"Created directory for 'model_pos' at: {model_pos_dir}")
+    if not os.path.exists(model_neg_dir):
+        os.makedirs(model_neg_dir)
+        print(f"Created directory for 'model_neg' at: {model_neg_dir}")
+
+        
     df_train = pd.read_csv(train_file)
     df_test = pd.read_csv(test_file)
 
@@ -118,8 +131,8 @@ def data_training(train_file, test_file):
     logging.info("Model trained for negative tweets.")
 
     # Load models
-    model_pos = load_model('/opt/airflow/dataset/model_pos')
-    model_neg = load_model('/opt/airflow/dataset/model_neg')
+    model_pos = load_model('/opt/airflow/models/model_pos')
+    model_neg = load_model('/opt/airflow/models/model_neg')
 
     # Predicting
     selected_texts = []
@@ -136,7 +149,6 @@ def data_training(train_file, test_file):
     # Example saving output to CSV, modify as necessary
     df_test.to_csv("/opt/airflow/dataset/predicted_data.csv", index=False)
     logging.info("Predicted data saved to CSV.")
-
 
 # if __name__ == "__main__":
 #     train_file = "train.csv"

@@ -68,6 +68,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/dataset:/opt/airflow/dataset
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/models
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
